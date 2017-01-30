@@ -13,17 +13,19 @@ use time::get_time;
 use player::Player;
 
 fn main() {
-    println!();
+    println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
-    println!();
+    println!("");
     testing();
 }
 
-// This function is for testing. Pls uncomment before commiting!
+// This function is for testing. Pls uncommend before commiting!
 fn testing() {
     println!("Testing:");
-    println!(">>> graphic::windows::draw_window()");
-    graphic::windows::draw_window();
+    // for entry in db::pokedex::Pokedex::new().get_entries() {
+    //     println!("{:?}", entry);
+    // }
+    // graphic::windows::draw_startscreen();
     // test_players();
 }
 
@@ -35,8 +37,8 @@ fn test_players() {
     let human = player::human::Human::new_by_id(&[5, 3, 17]);
 
     println!("{}", human.get_pokemon_count());
-    println!("{}", human.get_pokemon_list()[0].name);
-    println!("{}", human.get_pokemon_list()[1].name);
-    println!("{}", human.get_pokemon_list()[2].name);
+    println!("{}", human.get_pokemon_list()[0].get_name());
+    println!("{}", human.get_pokemon_list()[1].get_name());
+    println!("{}", human.get_pokemon_list()[2].get_name());
     println!("{}", human.get_alive());
 }

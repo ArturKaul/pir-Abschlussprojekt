@@ -5,11 +5,13 @@ extern crate rustc_serialize;
 use super::pokemon_model;
 use super::pokemon_token;
 use super::enums;
+use super::resolve;
 use self::num::FromPrimitive;
 use std::collections::HashMap;
 use std;
 
-///contains all important information of a move
+///Struct that is a representation of a move a pokemon can learn. Contains everything that is
+///needed to calculate it's impact given a user and a target Pokemon.
 #[derive(Debug, Clone, RustcDecodable)]
 pub struct Technique {
     attack_id: usize,
@@ -44,21 +46,28 @@ pub struct Technique {
 }
 
 impl Technique {
-    pub fn resolve_effect(&self, user: pokemon_model::PokemonModel,
-        target: pokemon_model::PokemonModel) {
-        match self.category {
+    ///Matches over the category of a move and calls a specific method in resolve.rs for this
+    ///category. All calculation is done inside the method, therefore no return is needed.
+    pub fn resolve_effect(&self, user: pokemon_token::PokemonToken,
+        target: pokemon_token::PokemonToken) {
+        match self.get_category() {
+            enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
             _ => {},
-        }
+        };
     }
 
+    ///Takes the attacked Pokemon as an input besides the move and calculate from their types
+    ///how effective the move is. Returns an appropriate enum for further calculations.
     pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> enums::TypeEffectiveness {
         let mut eff_count = 0;
-        if self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_one).unwrap();
+        if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().0)
+            .unwrap();
         }
-        if enemy.type_two != enums::types::undefined
-        && self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_two).unwrap();
+        if enemy.get_types().1 != enums::types::undefined
+        && self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().1)
+            .unwrap();
         }
         match eff_count {
             -2 => enums::TypeEffectiveness::NotEffective,
